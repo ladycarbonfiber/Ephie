@@ -5,19 +5,19 @@ In memory file system mostly as a playground for async rust
 ## Features
 (all commands are in client emulations mirroring gnu tools for usability/discoverability)
 
-[ ] Change working directory with `cd`
+- [ ] Change working directory with `cd`
 
-[ ] Create a new directory with `mkdir`
+- [ ] Create a new directory with `mkdir`
 
-[ ] Remove directory or "file" with `rm`
+- [ ] Remove directory or "file" with `rm`
 
-[ ] Create a new file with `touch`
+- [ ] Create a new file with `touch`
 
-[ ] Write to file with `cat`
+- [ ] Write to file with `cat`
 
-[ ] Read out file with `cat`
+- [ ] Read out file with `cat`
 
-[ ] Search working directory with `find`
+- [ ] Search working directory with `find`
 
 - [ ] Support for path operations
 
@@ -30,7 +30,7 @@ In memory file system mostly as a playground for async rust
   - [ ] auto mkdir
 
 
-[ ] Directory `cp` and `mv`
+- [ ] Directory `cp` and `mv`
 
 - [ ] AuthZ
 
