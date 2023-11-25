@@ -4,25 +4,46 @@ In memory file system mostly as a playground for async rust
 
 ## Features
 (all commands are in client emulations mirroring gnu tools for usability/discoverability)
-[] Change working directory with `cd`
-[] Create a new directory with `mkdir`
-[] Remove directory or "file" with `rm`
-[] Create a new file with `touch`
-[] Write to file with `cat`
-[] Read out file with `cat`
-[] Search working directory with `find`
-[] Support for path operations
- - [] absolute path
- - [] parent path
- - [] relative path
- - [] auto mkdir
-[] Directory `cp` and `mv`
-[] AuthZ
- - [] Assign users and groups to directories/files
- - [] create new users/groups
- - [] assign/remove users to groups
- - [] switch users
- - [] Restrict access based on user/group membership 
+
+- [ ] Change working directory with `cd`
+
+- [ ] Create a new directory with `mkdir`
+
+- [ ] Remove directory or "file" with `rm`
+
+- [ ] Create a new file with `touch`
+
+- [ ] Write to file with `cat`
+
+- [ ] Read out file with `cat`
+
+- [ ] Search working directory with `find`
+
+- [ ] Support for path operations
+
+  - [ ] absolute path
+
+  - [ ] parent path
+
+  - [ ] relative path
+
+  - [ ] auto mkdir
+
+
+- [ ] Directory `cp` and `mv`
+
+- [ ] AuthZ
+
+  - [ ] Assign users and groups to directories/files
+
+  - [ ] create new users/groups
+
+  - [ ] assign/remove users to groups
+
+  - [ ] switch users
+
+  - [ ] Restrict access based on user/group membership 
+
 
 ## Requirements
 ### Build
