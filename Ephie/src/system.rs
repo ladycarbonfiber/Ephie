@@ -1,5 +1,5 @@
+use crate::trie::FsLike;
 use std::sync::{Arc, Mutex};
-use crate::trie::{Trie};
 
 pub enum Command {
     CD(String),
@@ -9,4 +9,4 @@ pub enum Command {
     WHO,
 }
 
-pub type FileSystem = Arc<Mutex<Trie>>;
+pub type FileSystem = Arc<Mutex<FsLike>>;
