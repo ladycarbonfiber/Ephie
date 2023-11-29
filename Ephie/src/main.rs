@@ -1,6 +1,11 @@
-use tokio::net::{TcpListener, TcpStream};
-use tokio::io::{AsyncReadExt};
+mod session;
+mod system;
+mod test;
+mod trie;
+
 use std::str;
+use tokio::io::AsyncReadExt;
+use tokio::net::{TcpListener, TcpStream};
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("127.0.0.1:8888").await.unwrap();
@@ -11,24 +16,28 @@ async fn main() {
     }
 }
 
-async fn process(mut socket:TcpStream){
+async fn process(mut socket: TcpStream) {
     println!("Processing");
-    let mut buff = vec![0;5];
+    let mut buff = vec![0; 5];
     let mut out = String::new();
-    let  mut data = socket.read(&mut buff).await.expect("Failed to read data from socket");
-    if data > 0{
-        while data != 0{
-            let s = match str::from_utf8(&buff[0..data]){
+    let mut data = socket
+        .read(&mut buff)
+        .await
+        .expect("Failed to read data from socket");
+    if data > 0 {
+        while data != 0 {
+            let s = match str::from_utf8(&buff[0..data]) {
                 Ok(v) => v,
-                Err(_) => "error"
+                Err(_) => "error",
             };
             out.push_str(s);
-            data = socket.read(&mut buff).await.expect("Failed to read data from socket");
+            data = socket
+                .read(&mut buff)
+                .await
+                .expect("Failed to read data from socket");
         }
         println!("{out}")
-
-    }
-    else{
+    } else {
         println!("no data")
     }
 }

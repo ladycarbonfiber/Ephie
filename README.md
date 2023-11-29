@@ -5,9 +5,9 @@ In memory file system mostly as a playground for async rust
 ## Features
 (all commands are in client emulations mirroring gnu tools for usability/discoverability)
 
-- [ ] Change working directory with `cd`
+- [X] Change working directory with `cd`
 
-- [ ] Create a new directory with `mkdir`
+- [X] Create a new directory with `mkdir`
 
 - [ ] Remove directory or "file" with `rm`
 
@@ -21,7 +21,7 @@ In memory file system mostly as a playground for async rust
 
 - [ ] Support for path operations
 
-  - [ ] absolute path
+  - [X] absolute path
 
   - [ ] parent path
 
