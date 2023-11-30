@@ -99,17 +99,20 @@ In memory file system mostly as a playground for async rust
 ## Requirements
 ### Build
 - MAKE
-- rust
+- rust (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`) to install the tool chain comes with cargo
 - cargo
 
 ## Tests
 make test
 
 ## Build
-make all 
+make all
+
+## Release
+make release
 
 ## Run
-./ephied runs core daemon
+make rund
 
-./ephie-client -u <user> connect and interact with the file system
+make client
 
