@@ -61,6 +61,7 @@ impl From<(&str, &str)> for Command {
             "ls" => Command::LS,
             "rm" => Command::RM(value.1.to_string()),
             "read" => Command::READ(value.1.to_string()),
+            "touch" => Command::TOUCH(value.1.to_string()),
             _ => Command::UNKNOWN,
         }
     }
