@@ -69,6 +69,7 @@ impl From<&str> for Command {
         match value{
             "pwd" => Command::PWD,
             "whoami" => Command::WHO,
+            "ls" => Command::LS,
             _ =>Command::UNKNOWN
         }
     }
