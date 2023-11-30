@@ -3,7 +3,6 @@ Special case trie that splits on "/" backed with hashmap
  */
 use std::{
     collections::HashMap,
-    error::Error,
     ffi::OsStr,
     path::{Path, PathBuf},
 };
@@ -55,7 +54,24 @@ impl FsLike {
         match tree {
             FsLike::FileLike { .. } => return Err("Parent node isn't directory"),
             FsLike::DirectoryLike { children } => {
-                children.insert(node_name.into(), node);
+                if !children.contains_key(node_name.into()) {
+                    children.insert(node_name.into(), node);
+                } else {
+                    match children.get(node_name.into()).unwrap() {
+                        FsLike::FileLike { data } => {
+                            match &node {
+                                FsLike::FileLike { data: node_data } => {
+                                    if node_data.len() > 0 {
+                                        children.insert(node_name.into(), node);
+                                    }
+                                    // else is no op touching a file that exists
+                                }
+                                _ => {}
+                            }
+                        }
+                        FsLike::DirectoryLike { .. } => {}
+                    }
+                }
             }
         }
         Ok(())

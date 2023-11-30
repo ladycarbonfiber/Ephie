@@ -195,6 +195,38 @@ fn test_rm_directory_present() {
     assert!(!out.contains("Downloads"))
 }
 #[test]
+fn test_rm_file_nested() {
+    let mut session = test_session();
+    session.write_file("Downloads/new.file".to_string(), "test content".to_string());
+    session.remove("/Downloads/new.file".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("new.file"))
+}
+#[test]
+fn test_rm_file_nested_relative() {
+    let mut session = test_session();
+    session
+        .write_file("Downloads/new.file".to_string(), "test content".to_string())
+        .unwrap();
+    session.remove("Downloads/new.file".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("new.file"))
+}
+#[test]
+fn test_rm_directory_nested() {
+    let mut session = test_session();
+    session.write_file(
+        "Downloads/test/new.file".to_string(),
+        "test content".to_string(),
+    );
+    session.remove("/Downloads/test".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("test"))
+}
+#[test]
 #[should_panic]
 fn test_rm_directory_not_present() {
     let mut session = test_session();
@@ -215,4 +247,151 @@ fn test_rm_file_not_present() {
     session
         .remove("Downloads/test.missing".to_string())
         .unwrap();
+}
+#[test]
+fn test_touch_relative() {
+    let mut session = test_session();
+    session
+        .touch("Documents/Files/file.txt".to_string())
+        .unwrap();
+    session.change_dir("Documents/Files".to_string());
+    let out = session.list();
+    assert!(out.contains("file.txt"))
+}
+#[test]
+fn test_touch_existing_dir() {
+    let mut session = test_session();
+    // should be a no op since this is a directory
+    session.touch("Documents/paperwork".to_string()).unwrap();
+    session
+        .change_dir("Documents/paperwork".to_string())
+        .unwrap();
+    assert!(session.list().is_empty())
+}
+#[test]
+fn test_touch_existing_file_doesnt_overwrite() {
+    let mut session = test_session();
+    // should be a no op since this is a directory
+    session.touch("Downloads/test.hello".to_string()).unwrap();
+    let out = session
+        .read_file("Downloads/test.hello".to_string())
+        .unwrap();
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+fn test_read_file_exists() {
+    let session = test_session();
+    let out = session
+        .read_file("Downloads/test.hello".to_string())
+        .unwrap();
+
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+#[should_panic]
+fn test_read_file_missing() {
+    let session = test_session();
+    let out = session
+        .read_file("Downloads/missing.hello".to_string())
+        .unwrap();
+}
+#[test]
+#[should_panic]
+fn test_read_file_not_file() {
+    let session = test_session();
+    let out = session.read_file("Downloads".to_string()).unwrap();
+}
+#[test]
+fn test_write_file() {
+    let session = test_session();
+    let expected = "test contents";
+    session
+        .write_file(
+            "Documents/test.file".to_string(),
+            "test contents".to_string(),
+        )
+        .unwrap();
+    let out = session.read_file("Documents/test.file".into()).unwrap();
+    assert_eq!(out, expected.as_bytes())
+}
+#[test]
+fn test_write_file_should_overwrite() {
+    let session = test_session();
+    let expected = "test contents";
+    session
+        .write_file(
+            "Downloads/test.hello".to_string(),
+            "test contents".to_string(),
+        )
+        .unwrap();
+    let out = session.read_file("Downloads/test.hello".into()).unwrap();
+    assert_eq!(out, expected.as_bytes())
+}
+#[test]
+fn test_find_local_present() {
+    let session = test_session();
+    let out = session.find_local("Do".to_string()).unwrap();
+    assert!(out.contains(&"Downloads".to_string()));
+    assert!(out.contains(&"Documents".to_string()));
+}
+#[test]
+fn test_find_local_none() {
+    let session = test_session();
+    let out = session.find_local("Missing".to_string()).unwrap();
+    assert!(out.is_empty())
+}
+#[test]
+fn test_find_local_file() {
+    let mut session = test_session();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.find_local("test".to_string()).unwrap();
+    assert_eq!(out, vec!["test.hello"])
+}
+#[test]
+fn test_cp_file() {
+    let mut session = test_session();
+    session
+        .copy(
+            "Downloads/test.hello".to_string(),
+            "Documents/test.hello".to_string(),
+        )
+        .unwrap();
+    session.change_dir("/Documents".to_string()).unwrap();
+    let out = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+fn test_cp_to_here() {
+    let mut session = test_session();
+    session
+        .copy("Downloads/test.hello".to_string(), "test.hello".to_string())
+        .unwrap();
+    let out: Vec<u8> = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+fn test_mv_file() {
+    let mut session = test_session();
+    session
+        .mv(
+            "Downloads/test.hello".to_string(),
+            "Documents/test.hello".to_string(),
+        )
+        .unwrap();
+    session.change_dir("/Documents".to_string()).unwrap();
+    let out = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes());
+    session.change_dir("/Downloads".to_string()).unwrap();
+    assert!(session.list().is_empty())
+}
+#[test]
+fn test_mv_to_here() {
+    let mut session = test_session();
+    session
+        .mv("Downloads/test.hello".to_string(), "test.hello".to_string())
+        .unwrap();
+    let out: Vec<u8> = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes());
+    session.change_dir("/Downloads".to_string()).unwrap();
+    assert!(session.list().is_empty())
 }

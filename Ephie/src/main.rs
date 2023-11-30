@@ -8,7 +8,7 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
-use transport_layer::command::Command;
+use transport_layer::command::{Command, WRITE_DELIM};
 use trie::FsLike;
 #[tokio::main]
 async fn main() {
@@ -86,6 +86,60 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
             Command::RM(target) => match session.remove(target) {
                 Err(message) => message.to_string(),
                 Ok(()) => "".to_string(),
+            },
+            Command::TOUCH(target) => match session.touch(target) {
+                Err(message) => message.to_string(),
+                Ok(()) => "".to_string(),
+            },
+            Command::READ(target) => match session.read_file(target) {
+                Err(message) => message.to_string(),
+                Ok(data) => match str::from_utf8(&data) {
+                    Ok(v) => v.to_string(),
+                    Err(_) => "Error Reading out bytes".to_string(),
+                },
+            },
+            Command::WRITE(target) => {
+                let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
+                if parts.len() == 2 {
+                    match session.write_file(parts[0].to_string(), parts[1].to_string()) {
+                        Err(message) => message.to_string(),
+                        Ok(()) => "".to_string(),
+                    }
+                } else {
+                    "Mismatched input".to_string()
+                }
+            }
+            Command::CP(target) => {
+                let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
+                if parts.len() == 2 {
+                    match session.copy(parts[0].to_string(), parts[1].to_string()) {
+                        Err(message) => message.to_string(),
+                        Ok(()) => "".to_string(),
+                    }
+                } else {
+                    "Mismatched input".to_string()
+                }
+            }
+            Command::MV(target) => {
+                let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
+                if parts.len() == 2 {
+                    match session.mv(parts[0].to_string(), parts[1].to_string()) {
+                        Err(message) => message.to_string(),
+                        Ok(()) => "".to_string(),
+                    }
+                } else {
+                    "Mismatched input".to_string()
+                }
+            }
+            Command::FIND(target) => match session.find_local(target) {
+                Err(mess) => mess.to_string(),
+                Ok(list) => {
+                    if list.is_empty() {
+                        "pattern not found".to_string()
+                    } else {
+                        list.join(" | ")
+                    }
+                }
             },
             Command::UNKNOWN => "Unknown Command".to_string(),
         };

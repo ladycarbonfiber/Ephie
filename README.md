@@ -15,6 +15,16 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Help
 
+- [ ] List with `ls`
+
+  - [X] Working Directory
+
+  - [ ] absolute path
+
+  - [ ] relative path
+
+  - [ ] parent path
+
 - [X] Change working directory with `cd`
 
   - [X] absolute path
@@ -41,23 +51,23 @@ In memory file system mostly as a playground for async rust
 
   - [X] relative path
 
-- [ ] Create a new file with `touch`
+- [X] Create a new file with `touch`
 
-- [ ] Write to file with `write`
+- [X] Write to file with `write`
 
-- [ ] Read out file with `read`
+- [X] Read out file with `read`
 
-- [ ] Search working directory with `find`
+- [X] Search working directory with `find`
 
 - [ ] `cp`
 
-  - [ ] Files
+  - [X] Files
 
   - [ ] Directories
 
 - [ ] `mv`
 
-  - [ ] Files
+  - [X] Files
 
   - [ ] Directories
 
@@ -65,7 +75,11 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Assign users and groups to directories/files
 
-  - [ ] create new users/groups
+  - [ ] create new
+
+    - [ ] users
+
+    - [ ] groups 
 
   - [ ] assign/remove users to groups
 
@@ -77,21 +91,32 @@ In memory file system mostly as a playground for async rust
   - [X] Build on PR
   - [X] Test on PR
 
+## Current Scope Limitiations
+
+- Relative parent directory (ie `../..` or `foo/../bar`)
+
+- Client file writes are overwrite
+
+- Only support unix; windows paths are awful
+
 
 ## Requirements
 ### Build
 - MAKE
-- rust
+- rust (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`) to install the tool chain comes with cargo
 - cargo
 
 ## Tests
 make test
 
 ## Build
-make all 
+make all
+
+## Release
+make release
 
 ## Run
-./ephied runs core daemon
+make rund
 
-./ephie-client -u <user> connect and interact with the file system
+make client
 
