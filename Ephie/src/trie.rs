@@ -89,6 +89,7 @@ impl FsLike {
         let Some(first) = first else {
             return Some(self);
         };
+        // Support for those squirly .config dirs.
         if rest == Path::new(".") {
             return self.get_mut(rest);
         }
@@ -96,8 +97,24 @@ impl FsLike {
             .get_mut(first)
             .and_then(|child| child.get_mut(rest))
     }
-    pub fn remove(&mut self, path: PathBuf) -> Result<(), &'static &str> {
-        Ok(())
+    pub fn remove(&mut self, path: PathBuf) -> Result<(), &'static str> {
+        if self.get(&path).is_none() {
+            return Err("Not Found, cannot delete");
+        }
+        // If full path is present, pretty reasonable to safely unwrap parent
+        // However if the user is trying to rm .. we need to stop that
+        let parent_path = match path.parent() {
+            Some(parent) => parent,
+            None => return Err("Cannot remove .. or /"),
+        };
+        // likewise with "filename" (is directory if directory)
+        let target_path = PathBuf::from(path.file_name().unwrap());
+        let parent_node = self.get_mut(parent_path).unwrap();
+
+        parent_node
+            .children_mut()
+            .and_then(|c| c.remove(&target_path));
+        return Ok(());
     }
     pub fn children(&self) -> Option<&HashMap<PathBuf, FsLike>> {
         match &self {

@@ -7,6 +7,7 @@ pub enum Command {
     LS,
     PWD,
     WHO,
+    RM(String),
 }
 impl Command {
     pub fn opt_code(&self) -> u8 {
@@ -17,6 +18,7 @@ impl Command {
             Self::PWD => 3,
             Self::LS => 4,
             Self::WHO => 5,
+            Self::RM(..) => 6,
         }
     }
     // Bytes sent on the wire
@@ -46,6 +48,12 @@ impl Command {
                 payload.push(self.opt_code());
                 payload.push(0u8);
             }
+            Self::RM(target) => {
+                payload.push(self.opt_code());
+                payload.push(target.len().try_into().unwrap());
+                payload.extend(target.as_bytes().into_iter().clone());
+            }
+
             Self::UNKNOWN => {}
         };
         return payload;
@@ -57,6 +65,7 @@ impl From<(&str, &str)> for Command {
             "cd" => Command::CD(value.1.to_string()),
             "mkdir" => Command::MKDIR(value.1.to_string()),
             "ls" => Command::LS,
+            "rm" => Command::RM(value.1.to_string()),
             _ => Command::UNKNOWN,
         }
     }
@@ -79,6 +88,7 @@ impl From<(u8, String)> for Command {
             3 => Command::PWD,
             4 => Command::LS,
             5 => Command::WHO,
+            6 => Command::RM(value.1),
             _ => Command::UNKNOWN,
         }
     }

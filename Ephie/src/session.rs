@@ -105,4 +105,11 @@ impl Session {
 
         Ok(())
     }
+    pub fn remove(&mut self, target: String) -> Result<(), &'static str> {
+        let mut fs = self.file_system.lock().unwrap();
+        let mut destination_dir = self.working_dir.clone();
+        let adjusted_target = self.adjust_target(&target)?;
+        destination_dir.push(PathBuf::from(adjusted_target));
+        fs.remove(destination_dir)
+    }
 }
