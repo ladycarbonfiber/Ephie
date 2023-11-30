@@ -15,31 +15,31 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Help
 
-- [ ] Change working directory with `cd`
+- [X] Change working directory with `cd`
 
   - [X] absolute path
 
-  - [ ] parent path
+  - [X] parent path
 
   - [X] relative path
 
-- [ ] Create a new directory with `mkdir`
+- [X] Create a new directory with `mkdir`
 
   - [X] absolute path
 
-  - [ ] parent path
+  - [X] parent path
 
   - [X] relative path
 
   - [X] auto mkdir
 
-- [ ] Remove directory or "file" with `rm`
+- [X] Remove directory or "file" with `rm`
 
-  - [ ] absolute path
+  - [X] absolute path
 
-  - [ ] parent path
+  - [X] parent path
 
-  - [ ] relative path
+  - [X] relative path
 
 - [ ] Create a new file with `touch`
 

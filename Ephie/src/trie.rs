@@ -102,7 +102,11 @@ impl FsLike {
             return Err("Not Found, cannot delete");
         }
         // If full path is present, pretty reasonable to safely unwrap parent
-        let parent_path = path.parent().unwrap();
+        // However if the user is trying to rm .. we need to stop that
+        let parent_path = match path.parent() {
+            Some(parent) => parent,
+            None => return Err("Cannot remove .. or /"),
+        };
         // likewise with "filename" (is directory if directory)
         let target_path = PathBuf::from(path.file_name().unwrap());
         let parent_node = self.get_mut(parent_path).unwrap();
