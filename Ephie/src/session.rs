@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::ffi::{OsStr, OsString};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use crate::system::{Command, FileSystem};
 use crate::trie::FsLike::{self, DirectoryLike, FileLike};
@@ -13,7 +13,7 @@ fn append_to_path(path: impl Into<OsString>, s: impl AsRef<OsStr>) -> PathBuf {
 #[derive(Debug)]
 pub struct Session {
     //TODO resolve ownership to be more efficient.
-    pub working_dir: String,
+    pub working_dir: PathBuf,
     pub user: String,
     pub file_system: FileSystem,
 }
@@ -33,7 +33,7 @@ impl Session {
                     }
                     _ => {
                         //Shouldn't be possible
-                        println!("Something went wrong reading {}", &self.working_dir);
+                        println!("Something went wrong reading {:?}", self.working_dir.as_os_str());
                         return HashSet::new();
                     }
                 }
@@ -43,7 +43,7 @@ impl Session {
             }
         }
     }
-    pub fn current_dir(&self) -> &str {
+    pub fn current_dir(&self) -> &Path {
         return &self.working_dir;
     }
     pub fn current_user(&self) -> &str {
@@ -56,7 +56,7 @@ impl Session {
         match current_dir {
             None => {
                 //Another session might have removed the current directory; We should reset to root in this case
-                self.working_dir = "/".to_string();
+                self.working_dir = PathBuf::from("/");
                 return Err("Working dir appears to no long to be valid, resetting to root");
             }
             //TODO handle multi paths
@@ -67,12 +67,9 @@ impl Session {
                         match node {
                             DirectoryLike { .. } => {
                                 self.working_dir = append_to_path(
-                                    PathBuf::from(&self.working_dir),
+                                &self.working_dir,
                                     PathBuf::from(target),
                                 )
-                                .to_str()
-                                .unwrap() //assumes this is all valid path things
-                                .to_string();
                             }
                             FileLike { .. } => {
                                 return Err("Can't change working directory to a file")

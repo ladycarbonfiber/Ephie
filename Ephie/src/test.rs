@@ -41,7 +41,7 @@ fn test_session() -> Session {
     let db = Arc::new(Mutex::new(test_system()));
     Session {
         user: "TestUser".to_owned(),
-        working_dir: "/".to_owned(),
+        working_dir: PathBuf::from("/"),
         file_system: db.clone(),
     }
 }
@@ -62,7 +62,7 @@ fn test_ls_at_root() {
 #[test]
 fn test_pwd_at_root() {
     let session = test_session();
-    let expected = "/";
+    let expected = PathBuf::from("/");
     let out = session.current_dir();
     assert_eq!(out, expected);
 }
@@ -72,13 +72,13 @@ fn test_cd() {
     session
         .change_dir("Documents/".to_string())
         .expect("Dir not found");
-    let expected = "/Documents/";
+    let expected = PathBuf::from("/Documents/");
     let out = session.current_dir();
     assert_eq!(out, expected);
     session
         .change_dir("paperwork/".to_string())
         .expect("Not Found");
-    let expected_second = "/Documents/paperwork/";
+    let expected_second = PathBuf::from("/Documents/paperwork/");
     let out_second = session.current_dir();
     println!("{:#?}", &test_session());
     assert_eq!(out_second, expected_second);
