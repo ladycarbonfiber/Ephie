@@ -20,4 +20,18 @@ mod tests {
         let expected = vec![command.opt_code(), 0];
         assert_eq!(out, expected)
     }
+    #[test]
+    fn test_from_opt() {
+        let opts = vec![(1u8, "Documents"), (2, "NewDir"), (3, "")];
+        let expected = vec![
+            Command::CD("Documents".to_string()),
+            Command::MKDIR("NewDir".to_string()),
+            Command::PWD,
+        ];
+        let out = opts
+            .into_iter()
+            .map(|o| Command::from(o))
+            .collect::<Vec<Command>>();
+        assert_eq!(expected, out)
+    }
 }

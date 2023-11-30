@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq, PartialOrd)]
 pub enum Command {
     // Place holder for serialization
     UNKNOWN,
@@ -66,6 +67,18 @@ impl From<&str> for Command {
             "pwd" => Command::PWD,
             "whoami" => Command::WHO,
             "ls" => Command::LS,
+            _ => Command::UNKNOWN,
+        }
+    }
+}
+impl From<(u8, &str)> for Command {
+    fn from(value: (u8, &str)) -> Self {
+        match value.0 {
+            1 => Command::CD(value.1.to_string()),
+            2 => Command::MKDIR(value.1.to_string()),
+            3 => Command::PWD,
+            4 => Command::LS,
+            5 => Command::WHO,
             _ => Command::UNKNOWN,
         }
     }

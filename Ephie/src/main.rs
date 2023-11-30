@@ -3,15 +3,39 @@ mod system;
 mod test;
 mod trie;
 
+use std::path::PathBuf;
 use std::str;
+use session::Session;
+use system::FileSystem;
+use session::{Session};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::{Arc, Mutex},
+};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use trie::FsLike;
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("127.0.0.1:8888").await.unwrap();
+    
+    let mut system = FsLike::new();
+    system
+        .insert(PathBuf::from("/"), FsLike::new())
+        .expect("Failed to insert");
+    let db = Arc::new(Mutex::new(system));
+    
+    //TODO hashmap of sessions
+    let session = Session {
+        user: "TestUser".to_owned(),
+        working_dir: PathBuf::from("/"),
+        file_system: db.clone(),
+    };
+
 
     loop {
         let (socket, _) = listener.accept().await.unwrap();
+
         process(socket).await;
     }
 }
