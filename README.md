@@ -75,7 +75,11 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Assign users and groups to directories/files
 
-  - [ ] create new users/groups
+  - [ ] create new
+
+    - [ ] users
+
+    - [ ] groups 
 
   - [ ] assign/remove users to groups
 

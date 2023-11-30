@@ -98,7 +98,7 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                     Err(_) => "Error Reading out bytes".to_string(),
                 },
             },
-            Command::Write(target) => {
+            Command::WRITE(target) => {
                 let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
                 if parts.len() == 2 {
                     match session.write_file(parts[0].to_string(), parts[1].to_string()) {
@@ -109,6 +109,16 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                     "Mismatched input".to_string()
                 }
             }
+            Command::FIND(target) => match session.find_local(target) {
+                Err(mess) => mess.to_string(),
+                Ok(list) => {
+                    if list.is_empty() {
+                        "pattern not found".to_string()
+                    } else {
+                        list.join(" | ")
+                    }
+                }
+            },
             Command::UNKNOWN => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();

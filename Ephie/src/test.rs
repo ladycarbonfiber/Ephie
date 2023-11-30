@@ -195,6 +195,38 @@ fn test_rm_directory_present() {
     assert!(!out.contains("Downloads"))
 }
 #[test]
+fn test_rm_file_nested() {
+    let mut session = test_session();
+    session.write_file("Downloads/new.file".to_string(), "test content".to_string());
+    session.remove("/Downloads/new.file".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("new.file"))
+}
+#[test]
+fn test_rm_file_nested_relative() {
+    let mut session = test_session();
+    session
+        .write_file("Downloads/new.file".to_string(), "test content".to_string())
+        .unwrap();
+    session.remove("Downloads/new.file".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("new.file"))
+}
+#[test]
+fn test_rm_directoru_nested() {
+    let mut session = test_session();
+    session.write_file(
+        "Downloads/test/new.file".to_string(),
+        "test content".to_string(),
+    );
+    session.remove("/Downloads/test".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("test"))
+}
+#[test]
 #[should_panic]
 fn test_rm_directory_not_present() {
     let mut session = test_session();
@@ -294,4 +326,24 @@ fn test_write_file_should_overwrite() {
         .unwrap();
     let out = session.read_file("Downloads/test.hello".into()).unwrap();
     assert_eq!(out, expected.as_bytes())
+}
+#[test]
+fn test_find_local_present() {
+    let session = test_session();
+    let out = session.find_local("Do".to_string()).unwrap();
+    assert!(out.contains(&"Downloads".to_string()));
+    assert!(out.contains(&"Documents".to_string()));
+}
+#[test]
+fn test_find_local_none() {
+    let session = test_session();
+    let out = session.find_local("Missing".to_string()).unwrap();
+    assert!(out.is_empty())
+}
+#[test]
+fn test_find_local_file() {
+    let mut session = test_session();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.find_local("test".to_string()).unwrap();
+    assert_eq!(out, vec!["test.hello"])
 }

@@ -144,4 +144,36 @@ impl Session {
             },
         )
     }
+    // Searches for all files or directories in current work
+    pub fn find_local(&self, target: String) -> Result<Vec<String>, &'static str> {
+        let mut fs = self.file_system.lock().unwrap();
+        // let parent_dir = match self.adjust_target("..") {
+        //     Err(..) => "/".to_string(),
+        //     Ok(val) => val,
+        // };
+        let dir = self.adjust_target(self.current_dir().to_str().unwrap())?;
+        println!("{:?}", dir);
+        match fs.get(PathBuf::from(dir)) {
+            Some(node) => match node {
+                DirectoryLike { children } => {
+                    println!("{:?}", node);
+                    let mut out = Vec::new();
+                    for key in children.keys() {
+                        let name = key
+                            .file_name()
+                            .unwrap_or(&OsString::from("Error"))
+                            .to_str()
+                            .unwrap()
+                            .to_string();
+                        if name.contains(&target) {
+                            out.push(name);
+                        }
+                    }
+                    Ok(out)
+                }
+                _ => return Err("Cannot be in a file"),
+            },
+            None => return Err("Current Dir is invalid for some reason, resetting to root"),
+        }
+    }
 }
