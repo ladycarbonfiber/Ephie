@@ -1,16 +1,9 @@
-use tokio::io::AsyncWriteExt;
-use tokio::net::TcpStream;
-// async fn main() {
-// //     let mut stream = TcpStream::connect("127.0.0.1:8888").await.unwrap();
-
-// //     let result = stream.write(b"hello\n").await;
-// //     println!("wrote to stream; success={:?}", result.is_ok());
-//         let test = "/Documents/Downloads/";
-//         for part in test.split("/"){
-//             println!("{}",part)
-//         }
-//  }
 /// This example is taken from https://raw.githubusercontent.com/fdehau/tui-rs/master/examples/user_input.rs
+
+use tokio::io::{AsyncWriteExt,AsyncReadExt};
+use tokio::net::TcpStream;
+use std::str;
+
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -27,6 +20,8 @@ use ratatui::{
 use std::{error::Error, io};
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
+
+use transport_layer::command::Command;
 
 enum InputMode {
     Normal,
@@ -64,7 +59,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // create app and run it
     let app = App::default();
-    let res = run_app(&mut terminal, app);
+    let res =  run_app(&mut terminal, app).await;
 
     // restore terminal
     disable_raw_mode()?;
@@ -82,7 +77,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
+async fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     loop {
         terminal.draw(|f| ui::<B>(f, &app))?;
 
@@ -99,7 +94,43 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                 },
                 InputMode::Editing => match key.code {
                     KeyCode::Enter => {
+                        let mut stream = TcpStream::connect("127.0.0.1:8888").await.unwrap();
                         app.messages.push(app.input.value().into());
+                        let parts = app.input.value().split(" ").collect::<Vec<&str>>();
+                        let command = match parts.len() {
+                            0 => Command::UNKNOWN,
+                            1 => {
+                                Command::from(app.input.value())
+                            },
+                            _ => {
+                                Command::from((parts[0], parts[1]))
+                            }
+                            
+                        };
+                        app.messages.push(format!("{:?}",&command.to_bytes()));
+                        stream.write_all(&command.to_bytes()).await.unwrap();
+                        let mut buff = [0; 1];
+                        let read_payload = stream
+                        .read_exact(&mut buff)
+                        .await
+                        .expect("Failed to read data from socket");
+                        if read_payload > 0 {
+                            let payload_len = buff[0];
+                            let mut payload_buffer = vec![0u8; payload_len as usize];
+                            let read_data_len = stream
+                            .read_exact(&mut payload_buffer)
+                            .await
+                            .expect("Failed to read data from socket");
+                            if read_data_len > 0 {
+                                let s = match str::from_utf8(&payload_buffer[0..payload_len as usize]) {
+                                    Ok(v) => v,
+                                    Err(_) => "error",
+                                };
+                                app.messages.push(format!("Recieved: {}", s));
+
+                            }
+
+                        }
                         app.input.reset();
                     }
                     KeyCode::Esc => {

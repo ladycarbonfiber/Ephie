@@ -11,3 +11,4 @@ crossterm = "0.27.0"
 unicode-width = "0.1.10"
 ratatui = "0.24.0"
 tui-input = "0.8.0"
+transport-layer = {path = "../transport-layer"}

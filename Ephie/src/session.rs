@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::ffi::{OsStr, OsString};
 use std::path::{PathBuf, Path};
 
-use crate::system::{Command, FileSystem};
+use crate::system::FileSystem;
 use crate::trie::FsLike::{self, DirectoryLike, FileLike};
 // Creates new path from target and ref
 fn append_to_path(path: impl Into<OsString>, s: impl AsRef<OsStr>) -> PathBuf {
