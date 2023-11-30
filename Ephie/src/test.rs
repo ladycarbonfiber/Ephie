@@ -102,6 +102,40 @@ fn test_cd() {
     assert_eq!(out_second, expected_second);
 }
 #[test]
+fn test_cd_parent() {
+    let mut session = test_session();
+    session
+        .change_dir("Documents".to_string())
+        .expect("not Found");
+    session.change_dir("..".to_string()).expect("not found");
+    let out = session.current_dir();
+    assert_eq!(out, PathBuf::from("/"))
+}
+#[test]
+fn test_cd_parent_multi() {
+    let mut session = test_session();
+    session
+        .change_dir("Documents/paperwork".to_string())
+        .expect("not Found");
+    session
+        .change_dir("../projects".to_string())
+        .expect("not found");
+    let out = session.current_dir();
+    assert_eq!(out, PathBuf::from("/Documents/projects"))
+}
+// We don't support this yet
+#[test]
+#[should_panic]
+fn test_cd_parent_nested() {
+    let mut session = test_session();
+    session
+        .change_dir("Documents/paperwork".to_string())
+        .expect("not Found");
+    session.change_dir("../..".to_string()).expect("not found");
+    let out = session.current_dir();
+    assert_eq!(out, PathBuf::from("/"))
+}
+#[test]
 fn test_mkdir_absolute() {
     let mut session = test_session();
     session
@@ -119,6 +153,15 @@ fn test_mkdir_relative() {
         .expect("Root not found");
     let out = session.list();
     assert!(out.contains("Pictures"));
+}
+#[test]
+fn test_mkdir_parent() {
+    let mut session = test_session();
+    session.change_dir("Documents".to_string()).unwrap();
+    session.make_dir("../Pictures".to_string()).unwrap();
+    session.change_dir("..".to_string()).unwrap();
+    let out = session.list();
+    assert!(out.contains("Pictures"))
 }
 #[test]
 fn test_mkdir_absolute_nested() {
