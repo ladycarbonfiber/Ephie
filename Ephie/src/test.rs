@@ -237,6 +237,16 @@ fn test_touch_existing_dir() {
     assert!(session.list().is_empty())
 }
 #[test]
+fn test_touch_existing_file_doesnt_overwrite() {
+    let mut session = test_session();
+    // should be a no op since this is a directory
+    session.touch("Downloads/test.hello".to_string()).unwrap();
+    let out = session
+        .read_file("Downloads/test.hello".to_string())
+        .unwrap();
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
 fn test_read_file_exists() {
     let session = test_session();
     let out = session
@@ -258,4 +268,30 @@ fn test_read_file_missing() {
 fn test_read_file_not_file() {
     let session = test_session();
     let out = session.read_file("Downloads".to_string()).unwrap();
+}
+#[test]
+fn test_write_file() {
+    let session = test_session();
+    let expected = "test contents";
+    session
+        .write_file(
+            "Documents/test.file".to_string(),
+            "test contents".to_string(),
+        )
+        .unwrap();
+    let out = session.read_file("Documents/test.file".into()).unwrap();
+    assert_eq!(out, expected.as_bytes())
+}
+#[test]
+fn test_write_file_should_overwrite() {
+    let session = test_session();
+    let expected = "test contents";
+    session
+        .write_file(
+            "Downloads/test.hello".to_string(),
+            "test contents".to_string(),
+        )
+        .unwrap();
+    let out = session.read_file("Downloads/test.hello".into()).unwrap();
+    assert_eq!(out, expected.as_bytes())
 }

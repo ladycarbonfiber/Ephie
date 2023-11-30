@@ -20,7 +20,7 @@ use std::{error::Error, io};
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
 
-use transport_layer::command::Command;
+use transport_layer::command::{Command, WRITE_DELIM};
 
 enum InputMode {
     Normal,
@@ -95,10 +95,40 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Re
                     KeyCode::Enter => {
                         let mut stream = TcpStream::connect("127.0.0.1:8888").await.unwrap();
                         app.messages.push(app.input.value().into());
-                        let parts = app.input.value().split_whitespace().collect::<Vec<&str>>();
+                        //let mut parts_iter = app.input.value().clone();
+
+                        let mut parts = app
+                            .input
+                            .value()
+                            .split_whitespace()
+                            .take(2)
+                            .collect::<Vec<&str>>();
+                        // allows us to have white space in what we write
+                        let maybe_write_part = app
+                            .input
+                            .value()
+                            .split_whitespace()
+                            .skip(2)
+                            .collect::<Vec<&str>>()
+                            .join(" ");
+                        if !maybe_write_part.is_empty() {
+                            parts.push(&maybe_write_part.as_str());
+                        }
+
                         let command = match parts.len() {
                             0 => Command::UNKNOWN,
                             1 => Command::from(app.input.value()),
+                            3 => {
+                                if parts[0] == "write" {
+                                    let mut combined = String::new();
+                                    combined.push_str(parts[1]);
+                                    combined.push_str(WRITE_DELIM);
+                                    combined.push_str(parts[2]);
+                                    Command::from((parts[0], combined.as_str()))
+                                } else {
+                                    Command::UNKNOWN
+                                }
+                            }
                             _ => Command::from((parts[0], parts[1])),
                         };
                         //For debugging

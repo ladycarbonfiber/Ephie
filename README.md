@@ -53,9 +53,9 @@ In memory file system mostly as a playground for async rust
 
 - [X] Create a new file with `touch`
 
-- [ ] Write to file with `write`
+- [X] Write to file with `write`
 
-- [ ] Read out file with `read`
+- [X] Read out file with `read`
 
 - [ ] Search working directory with `find`
 
@@ -91,7 +91,9 @@ In memory file system mostly as a playground for async rust
 
 - Relative parent directory (ie `../..` or `foo/../bar`)
 
-- Client file writes are overwrite and don't support spaces
+- Client file writes are overwrite
+
+- Only support unix; windows paths are awful
 
 
 ## Requirements

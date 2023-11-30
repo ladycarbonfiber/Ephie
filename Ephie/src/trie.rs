@@ -56,6 +56,21 @@ impl FsLike {
             FsLike::DirectoryLike { children } => {
                 if !children.contains_key(node_name.into()) {
                     children.insert(node_name.into(), node);
+                } else {
+                    match children.get(node_name.into()).unwrap() {
+                        FsLike::FileLike { data } => {
+                            match &node {
+                                FsLike::FileLike { data: node_data } => {
+                                    if node_data.len() > 0 {
+                                        children.insert(node_name.into(), node);
+                                    }
+                                    // else is no op touching a file that exists
+                                }
+                                _ => {}
+                            }
+                        }
+                        FsLike::DirectoryLike { .. } => {}
+                    }
                 }
             }
         }

@@ -8,7 +8,7 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
-use transport_layer::command::Command;
+use transport_layer::command::{Command, WRITE_DELIM};
 use trie::FsLike;
 #[tokio::main]
 async fn main() {
@@ -98,6 +98,17 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                     Err(_) => "Error Reading out bytes".to_string(),
                 },
             },
+            Command::Write(target) => {
+                let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
+                if parts.len() == 2 {
+                    match session.write_file(parts[0].to_string(), parts[1].to_string()) {
+                        Err(message) => message.to_string(),
+                        Ok(()) => "".to_string(),
+                    }
+                } else {
+                    "Mismatched input".to_string()
+                }
+            }
             Command::UNKNOWN => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();
