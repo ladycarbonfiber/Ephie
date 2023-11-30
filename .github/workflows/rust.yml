@@ -12,26 +12,31 @@ env:
 jobs:
   server:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Ephie
     steps:
     - uses: actions/checkout@v4
-    - name: Nav
-      run: cd Ephie
     - name: Build
       run: cargo build --verbose
     - name: Test
       run: cargo test --verbose
   lib:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./transport-layer
     steps:
     - uses: actions/checkout@v4
-    - name: Nav
-      run: cd transport-layer
     - name: Build
       run: cargo build --verbose
     - name: Test
       run: cargo test --verbose
   client:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Ephie-client
     steps:
     - uses: actions/checkout@v4
     - name: Nav
