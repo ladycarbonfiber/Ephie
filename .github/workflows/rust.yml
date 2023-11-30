@@ -39,8 +39,6 @@ jobs:
         working-directory: ./Ephie-client
     steps:
     - uses: actions/checkout@v4
-    - name: Nav
-      run: cd Ephie-client
     - name: Build
       run: cargo build --verbose
     - name: Test
