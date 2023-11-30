@@ -216,3 +216,23 @@ fn test_rm_file_not_present() {
         .remove("Downloads/test.missing".to_string())
         .unwrap();
 }
+#[test]
+fn test_touch_relative() {
+    let mut session = test_session();
+    session
+        .touch("Documents/Files/file.txt".to_string())
+        .unwrap();
+    session.change_dir("Documents/Files".to_string());
+    let out = session.list();
+    assert!(out.contains("file.txt"))
+}
+#[test]
+fn test_touch_existing_dir() {
+    let mut session = test_session();
+    // should be a no op since this is a directory
+    session.touch("Documents/paperwork".to_string()).unwrap();
+    session
+        .change_dir("Documents/paperwork".to_string())
+        .unwrap();
+    assert!(session.list().is_empty())
+}

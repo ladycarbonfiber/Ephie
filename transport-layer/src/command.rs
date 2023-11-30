@@ -8,6 +8,7 @@ pub enum Command {
     PWD,
     WHO,
     RM(String),
+    TOUCH(String),
 }
 impl Command {
     pub fn opt_code(&self) -> u8 {
@@ -19,6 +20,8 @@ impl Command {
             Self::LS => 4,
             Self::WHO => 5,
             Self::RM(..) => 6,
+            Self::TOUCH(..) => 7
+
         }
     }
     // Bytes sent on the wire
@@ -26,29 +29,15 @@ impl Command {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut payload = Vec::new();
         match self {
-            Self::CD(target) => {
-                payload.push(self.opt_code());
-                payload.push(target.len().try_into().unwrap());
-                payload.extend(target.as_bytes().into_iter().clone());
-            }
-            Self::MKDIR(target) => {
-                payload.push(self.opt_code());
-                payload.push(target.len().try_into().unwrap());
-                payload.extend(target.as_bytes().into_iter().clone());
-            }
-            Self::LS => {
+            Self::LS  => {
                 payload.push(self.opt_code());
                 payload.push(0u8);
             }
-            Self::PWD => {
+            Self::PWD | Self::WHO => {
                 payload.push(self.opt_code());
                 payload.push(0u8);
             }
-            Self::WHO => {
-                payload.push(self.opt_code());
-                payload.push(0u8);
-            }
-            Self::RM(target) => {
+            Self::TOUCH(target) | Self::RM(target) | Self::MKDIR(target) | Self::CD(target)=>{
                 payload.push(self.opt_code());
                 payload.push(target.len().try_into().unwrap());
                 payload.extend(target.as_bytes().into_iter().clone());

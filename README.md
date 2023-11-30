@@ -15,6 +15,16 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Help
 
+- [ ] List with `ls`
+
+  - [X] Working Directory
+
+  - [ ] absolute path
+
+  - [ ] relative path
+
+  - [ ] parent path
+
 - [X] Change working directory with `cd`
 
   - [X] absolute path
@@ -41,7 +51,7 @@ In memory file system mostly as a playground for async rust
 
   - [X] relative path
 
-- [ ] Create a new file with `touch`
+- [X] Create a new file with `touch`
 
 - [ ] Write to file with `write`
 
@@ -76,6 +86,12 @@ In memory file system mostly as a playground for async rust
 - [X] CI
   - [X] Build on PR
   - [X] Test on PR
+
+## Current Scope Limitiations
+
+- Relative parent directory (ie `../..` or `foo/../bar`)
+
+- Client file writes are overwrite and don't support spaces
 
 
 ## Requirements

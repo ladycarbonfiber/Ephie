@@ -55,7 +55,9 @@ impl FsLike {
         match tree {
             FsLike::FileLike { .. } => return Err("Parent node isn't directory"),
             FsLike::DirectoryLike { children } => {
-                children.insert(node_name.into(), node);
+                if !children.contains_key(node_name.into()) {
+                    children.insert(node_name.into(), node);
+                }
             }
         }
         Ok(())

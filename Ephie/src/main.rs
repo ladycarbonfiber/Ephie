@@ -87,6 +87,10 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                 Err(message) => message.to_string(),
                 Ok(()) => "".to_string(),
             },
+            Command::TOUCH(target) => match session.touch(target) {
+                Err(message) => message.to_string(),
+                Ok(()) => "".to_string(),
+            },
             Command::UNKNOWN => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();
