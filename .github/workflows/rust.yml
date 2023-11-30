@@ -10,13 +10,36 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  server:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./Ephie
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
       run: cargo build --verbose
-    - name: Run tests
+    - name: Test
+      run: cargo test --verbose
+  lib:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./transport-layer
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: cargo build --verbose
+    - name: Test
+      run: cargo test --verbose
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Ephie-client
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: cargo build --verbose
+    - name: Test
       run: cargo test --verbose
