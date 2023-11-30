@@ -35,6 +35,8 @@ struct App {
     input_mode: InputMode,
     /// History of recorded messages
     messages: Vec<String>,
+    /// Active User id
+    user: String,
 }
 
 impl Default for App {
@@ -43,6 +45,7 @@ impl Default for App {
             input: Input::default(),
             input_mode: InputMode::Normal,
             messages: Vec::new(),
+            user: "1".to_string(),
         }
     }
 }
@@ -137,8 +140,17 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Re
                             Command::UNKNOWN => {
                                 app.messages.push(format!("command unknown"));
                             }
+                            Command::SU(user) =>{
+                                app.user = user;
+                            }
                             _ => {
-                                stream.write_all(&command.to_bytes()).await.unwrap();
+                                let user_code = match app.user.as_str() {
+                                    "1" => 1u8,
+                                    "2" => 2u8,
+                                    "3" => 3u8,
+                                    _ =>u8::MAX,
+                                };
+                                stream.write_all(&command.to_bytes(user_code)).await.unwrap();
                                 let mut buff = [0; 1];
                                 let read_payload = stream
                                     .read_exact(&mut buff)

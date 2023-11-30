@@ -9,7 +9,7 @@ In memory file system mostly as a playground for async rust
 
   - [X] Interactive
 
-  - [ ] Multi-user Concurrent Support
+  - [X] Multi-user Concurrent Support
 
   - [ ] Auto clear
 
@@ -83,7 +83,7 @@ In memory file system mostly as a playground for async rust
 
   - [ ] assign/remove users to groups
 
-  - [ ] switch users
+  - [X] switch users
 
   - [ ] Restrict access based on user/group membership 
 

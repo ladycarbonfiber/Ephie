@@ -16,6 +16,7 @@ pub enum Command {
     FIND(String),
     CP(String),
     MV(String),
+    SU(String),
 }
 impl Command {
     pub fn opt_code(&self) -> u8 {
@@ -33,12 +34,14 @@ impl Command {
             Self::FIND(..) => 10,
             Self::CP(..) => 11,
             Self::MV(..) => 12,
+            Self::SU(..) => 13,
         }
     }
     // Bytes sent on the wire
     // Format opt<u8>payloadlen<usize>payload
-    pub fn to_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self, user_id: u8) -> Vec<u8> {
         let mut payload = Vec::new();
+        payload.push(user_id);
         match self {
             Self::LS => {
                 payload.push(self.opt_code());
@@ -62,7 +65,7 @@ impl Command {
                 payload.extend(target.as_bytes().into_iter().clone());
             }
 
-            Self::UNKNOWN => {}
+            Self::UNKNOWN | Self::SU(..) => {}
         };
         return payload;
     }
@@ -80,6 +83,7 @@ impl From<(&str, &str)> for Command {
             "find" => Command::FIND(value.1.to_string()),
             "cp" => Command::CP(value.1.to_string()),
             "mv" => Command::MV(value.1.to_string()),
+            "su" => Command::SU(value.1.to_string()),
             _ => Command::UNKNOWN,
         }
     }
