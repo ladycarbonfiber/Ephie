@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::ffi::{OsStr, OsString};
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use crate::system::FileSystem;
 use crate::trie::FsLike::{self, DirectoryLike, FileLike};
@@ -33,7 +33,10 @@ impl Session {
                     }
                     _ => {
                         //Shouldn't be possible
-                        println!("Something went wrong reading {:?}", self.working_dir.as_os_str());
+                        println!(
+                            "Something went wrong reading {:?}",
+                            self.working_dir.as_os_str()
+                        );
                         return HashSet::new();
                     }
                 }
@@ -63,19 +66,13 @@ impl Session {
             Some(dir) => {
                 let maybe_new_dir = dir.get(PathBuf::from(&target));
                 match maybe_new_dir {
-                    Some(node) => {
-                        match node {
-                            DirectoryLike { .. } => {
-                                self.working_dir = append_to_path(
-                                &self.working_dir,
-                                    PathBuf::from(target),
-                                )
-                            }
-                            FileLike { .. } => {
-                                return Err("Can't change working directory to a file")
-                            }
+                    Some(node) => match node {
+                        DirectoryLike { .. } => {
+                            self.working_dir =
+                                append_to_path(&self.working_dir, PathBuf::from(target))
                         }
-                    }
+                        FileLike { .. } => return Err("Can't change working directory to a file"),
+                    },
                     None => return Err("Directory not found"),
                 };
             }

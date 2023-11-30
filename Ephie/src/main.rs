@@ -28,26 +28,24 @@ async fn process(mut socket: TcpStream) {
         let command = buff[0];
         println!("read command:{}", &command);
         let read_payload = socket
-        .read_exact(&mut buff)
-        .await
-        .expect("Failed to read data from socket");
-        if read_payload > 0{
+            .read_exact(&mut buff)
+            .await
+            .expect("Failed to read data from socket");
+        if read_payload > 0 {
             let payload_len = buff[0];
             println!("read payload length:{}", &payload_len);
             let mut payload_buffer = vec![0u8; payload_len as usize];
             let mut read_data_len = socket
-            .read_exact(&mut payload_buffer)
-            .await
-            .expect("Failed to read data from socket");
-            if read_data_len >0{
+                .read_exact(&mut payload_buffer)
+                .await
+                .expect("Failed to read data from socket");
+            if read_data_len > 0 {
                 let s = match str::from_utf8(&payload_buffer[0..payload_len as usize]) {
                     Ok(v) => v,
                     Err(_) => "error",
                 };
                 out.push_str(s);
             }
-
-
         }
         let message = "success";
         println!("command:{command}\n {out}");
