@@ -1,5 +1,5 @@
 use crate::{
-    session::Session,
+    session::{self, Session},
     trie::{FsLike, FsLike::FileLike},
 };
 use std::path::PathBuf;
@@ -186,4 +186,33 @@ fn test_mkdir_relative_nested() {
         .expect("not found");
     let out = session.list();
     assert!(out.contains("Mexico"));
+}
+#[test]
+fn test_rm_directory_present() {
+    let mut session = test_session();
+    session.remove("/Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("Downloads"))
+}
+#[test]
+#[should_panic]
+fn test_rm_directory_not_present() {
+    let mut session = test_session();
+    session.remove("/Missing".to_string()).unwrap();
+}
+#[test]
+fn test_rm_file_presnt() {
+    let mut session = test_session();
+    session.remove("Downloads/test.hello".to_string()).unwrap();
+    session.change_dir("Downloads".to_string()).unwrap();
+    let out = session.list();
+    assert!(!out.contains("test.hello"))
+}
+#[test]
+#[should_panic]
+fn test_rm_file_not_present() {
+    let mut session = test_session();
+    session
+        .remove("Downloads/test.missing".to_string())
+        .unwrap();
 }

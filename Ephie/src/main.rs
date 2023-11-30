@@ -83,6 +83,7 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                 println!("out is {:#?}", out);
                 out.clone()
             }
+            Command::RM(target) => "Rm unimplmented".to_string(),
             Command::UNKNOWN => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();
