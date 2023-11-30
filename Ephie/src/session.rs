@@ -59,11 +59,30 @@ impl Session {
     pub fn current_user(&self) -> &str {
         return &self.user;
     }
+    // Replaces .. with the parent of the current working directory for path navigation
+    // TODO support nested relative .. in a path
+    // probably would require stepping the working directory
+    fn adjust_target(&self, target: &str) -> Result<String, &'static str> {
+        let parent = self.working_dir.parent();
+        if target.contains("..") {
+            if target.starts_with("/") {
+                return Err("Parent dir isn't supported in absolute paths");
+            }
+            match parent {
+                Some(path) => Ok(target.replace("..", path.as_os_str().to_str().unwrap())),
+                None => return Err("Cannot adjust for .. with no parent"),
+            }
+        } else {
+            Ok(target.to_string())
+        }
+    }
     pub fn change_dir(&mut self, target: String) -> Result<(), &'static str> {
         let fs = self.file_system.lock().unwrap();
         let mut destination_dir = self.working_dir.clone();
+        let adjusted_target = self.adjust_target(&target)?;
+
         // Pushing a relative path extends it, pushing an absolute path replaces
-        destination_dir.push(PathBuf::from(target));
+        destination_dir.push(PathBuf::from(adjusted_target));
         let maybe_new_dir = fs.get(PathBuf::from(&destination_dir));
         match maybe_new_dir {
             Some(node) => match node {
@@ -78,8 +97,10 @@ impl Session {
     pub fn make_dir(&mut self, target: String) -> Result<(), &'static str> {
         let mut fs = self.file_system.lock().unwrap();
         let mut destination_dir = self.working_dir.clone();
+        let adjusted_target = self.adjust_target(&target)?;
+
         // Pushing a relative path extends it, pushing an absolute path replaces
-        destination_dir.push(PathBuf::from(target));
+        destination_dir.push(PathBuf::from(adjusted_target));
         fs.insert(PathBuf::from(&destination_dir), FsLike::new())?;
 
         Ok(())
