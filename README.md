@@ -102,21 +102,20 @@ In memory file system mostly as a playground for async rust
 
 ## Requirements
 ### Build
-- MAKE
 - rust (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`) to install the tool chain comes with cargo
 - cargo
 
 ## Tests
-make test
+cargo test in relevant folders
 
 ## Build
-make all
+bash build.sh
 
 ## Release
-make release
+bash release.sh
 
 ## Run
-make rund
+bash run-server.sh
 
-make client
+bash run-client.sh
 
