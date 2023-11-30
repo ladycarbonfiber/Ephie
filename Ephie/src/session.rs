@@ -119,4 +119,17 @@ impl Session {
         destination_dir.push(PathBuf::from(adjusted_target));
         fs.insert(destination_dir, FileLike { data: Vec::new() })
     }
+    pub fn read_file(&self, target: String) -> Result<Vec<u8>, &'static str> {
+        let mut fs = self.file_system.lock().unwrap();
+        let mut destination_dir = self.working_dir.clone();
+        let adjusted_target = self.adjust_target(&target)?;
+        destination_dir.push(PathBuf::from(adjusted_target));
+        match fs.get(destination_dir) {
+            Some(node) => match node {
+                DirectoryLike { .. } => return Err("Can only read files"),
+                FileLike { data } => return Ok(data.clone()),
+            },
+            None => return Err("File not found"),
+        }
+    }
 }

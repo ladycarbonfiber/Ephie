@@ -91,6 +91,13 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                 Err(message) => message.to_string(),
                 Ok(()) => "".to_string(),
             },
+            Command::READ(target) => match session.read_file(target) {
+                Err(message) => message.to_string(),
+                Ok(data) => match str::from_utf8(&data) {
+                    Ok(v) => v.to_string(),
+                    Err(_) => "Error Reading out bytes".to_string(),
+                },
+            },
             Command::UNKNOWN => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();

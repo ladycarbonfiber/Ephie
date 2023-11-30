@@ -3,7 +3,6 @@ Special case trie that splits on "/" backed with hashmap
  */
 use std::{
     collections::HashMap,
-    error::Error,
     ffi::OsStr,
     path::{Path, PathBuf},
 };

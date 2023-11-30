@@ -236,3 +236,26 @@ fn test_touch_existing_dir() {
         .unwrap();
     assert!(session.list().is_empty())
 }
+#[test]
+fn test_read_file_exists() {
+    let session = test_session();
+    let out = session
+        .read_file("Downloads/test.hello".to_string())
+        .unwrap();
+
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+#[should_panic]
+fn test_read_file_missing() {
+    let session = test_session();
+    let out = session
+        .read_file("Downloads/missing.hello".to_string())
+        .unwrap();
+}
+#[test]
+#[should_panic]
+fn test_read_file_not_file() {
+    let session = test_session();
+    let out = session.read_file("Downloads".to_string()).unwrap();
+}
