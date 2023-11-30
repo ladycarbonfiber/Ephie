@@ -1,6 +1,5 @@
 use crate::{
     session::Session,
-    system::Command,
     trie::{FsLike, FsLike::FileLike},
 };
 use std::path::PathBuf;
