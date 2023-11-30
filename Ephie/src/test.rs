@@ -38,11 +38,7 @@ fn test_system() -> FsLike {
 
 fn test_session() -> Session {
     let db = Arc::new(Mutex::new(test_system()));
-    Session {
-        user: "TestUser".to_owned(),
-        working_dir: PathBuf::from("/"),
-        file_system: db.clone(),
-    }
+    Session::new("TestUser".to_string(), db.clone())
 }
 
 #[test]
@@ -62,6 +58,29 @@ fn test_ls_at_root() {
 fn test_pwd_at_root() {
     let session = test_session();
     let expected = PathBuf::from("/");
+    let out = session.current_dir();
+    assert_eq!(out, expected);
+}
+#[test]
+fn test_pwd_at_folder() {
+    let mut session = test_session();
+    let expected = PathBuf::from("/Documents/projects");
+    session
+        .change_dir("/Documents/projects".to_string())
+        .expect("Dir not found");
+    let out = session.current_dir();
+    assert_eq!(out, expected);
+}
+#[test]
+fn test_pwd_at_folder_step_into() {
+    let mut session = test_session();
+    let expected = PathBuf::from("/Documents/projects");
+    session
+        .change_dir("Documents".to_string())
+        .expect("Dir not found");
+    session
+        .change_dir("projects".to_string())
+        .expect("Dir not found");
     let out = session.current_dir();
     assert_eq!(out, expected);
 }
@@ -100,4 +119,28 @@ fn test_mkdir_relative() {
         .expect("Root not found");
     let out = session.list();
     assert!(out.contains("Pictures"));
+}
+#[test]
+fn test_mkdir_absolute_nested() {
+    let mut session = test_session();
+    session
+        .make_dir("/Pictures/Mexico".to_string())
+        .expect("Root not found");
+    session
+        .change_dir("Pictures".to_string())
+        .expect("not found");
+    let out = session.list();
+    assert!(out.contains("Mexico"));
+}
+#[test]
+fn test_mkdir_relative_nested() {
+    let mut session = test_session();
+    session
+        .make_dir("Pictures/Mexico".to_string())
+        .expect("Root not found");
+    session
+        .change_dir("Pictures".to_string())
+        .expect("not found");
+    let out = session.list();
+    assert!(out.contains("Mexico"));
 }

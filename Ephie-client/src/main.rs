@@ -101,7 +101,8 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Re
                             1 => Command::from(app.input.value()),
                             _ => Command::from((parts[0], parts[1])),
                         };
-                        app.messages.push(format!("{:?}", &command.to_bytes()));
+                        //For debugging
+                        //app.messages.push(format!("{:?}", &command.to_bytes()));
                         match command {
                             Command::UNKNOWN => {
                                 app.messages.push(format!("command unknown"));
