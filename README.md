@@ -9,7 +9,7 @@ In memory file system mostly as a playground for async rust
 
   - [X] Interactive
 
-  - [ ] Multi-user Concurrent Support
+  - [X] Multi-user Concurrent Support
 
   - [ ] Auto clear
 

@@ -2,6 +2,7 @@ mod session;
 mod system;
 mod test;
 mod trie;
+use dashmap::DashMap;
 use session::Session;
 use std::path::PathBuf;
 use std::str;
@@ -15,23 +16,28 @@ async fn main() {
     let listener = TcpListener::bind("127.0.0.1:8888").await.unwrap();
 
     let mut system = FsLike::new();
+    let mut sessions = DashMap::<String, Session>::new();
     system
         .insert(PathBuf::from("/"), FsLike::new())
         .expect("Failed to insert");
     let db = Arc::new(Mutex::new(system));
-
+    let session = Session::new("TestUser".to_string(), db.clone());
+    sessions.insert("TestUser".to_string(), session);
+    let users = Arc::new(sessions);
     //TODO hashmap of sessions
-    let mut session = Session::new("TestUser".to_string(), db.clone());
 
     loop {
         let (socket, _) = listener.accept().await.unwrap();
-
-        process(socket, &mut session).await;
+        let local_sessions = users.clone();
+        tokio::spawn(async move {
+            process(socket, local_sessions).await;
+        });
     }
 }
 
-async fn process(mut socket: TcpStream, session: &mut Session) {
+async fn process(mut socket: TcpStream, session_ref: Arc<DashMap<String, Session>>) {
     println!("Processing");
+    let mut session = session_ref.get_mut("TestUser").unwrap();
     let mut buff = [0; 1];
     let mut out = String::new();
     let command_code = socket
