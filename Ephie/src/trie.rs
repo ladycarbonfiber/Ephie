@@ -34,10 +34,22 @@ impl FsLike {
                 FsLike::DirectoryLike { .. } => {}
                 FsLike::FileLike { .. } => return Err("Cannot insert into a non directory"),
             }
+            // If parent not found create it
+            match tree.get_mut(path_part) {
+                Some(..) => {}
+                None => {
+                    tree.insert(
+                        path_part,
+                        FsLike::DirectoryLike {
+                            children: HashMap::new(),
+                        },
+                    )?;
+                }
+            };
             tree = if let Some(tree) = tree.get_mut(path_part) {
                 tree
             } else {
-                return Err("Parent Dir doesn't exist");
+                return Err("Nested Dir creation failed");
             }
         }
         match tree {

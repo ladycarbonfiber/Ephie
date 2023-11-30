@@ -21,11 +21,7 @@ async fn main() {
     let db = Arc::new(Mutex::new(system));
 
     //TODO hashmap of sessions
-    let mut session = Session {
-        user: "TestUser".to_owned(),
-        working_dir: PathBuf::from("/"),
-        file_system: db.clone(),
-    };
+    let mut session = Session::new("TestUser".to_string(), db.clone());
 
     loop {
         let (socket, _) = listener.accept().await.unwrap();
@@ -72,12 +68,12 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                 Err(message) => message.to_string(),
                 Ok(()) => "".to_string(),
             },
-            Command::PWD => session.working_dir.to_str().unwrap().to_string(),
+            Command::PWD => session.current_dir().to_str().unwrap().to_string(),
             Command::MKDIR(target) => match session.make_dir(target) {
                 Err(message) => message.to_string(),
                 Ok(()) => "".to_string(),
             },
-            Command::WHO => session.user.clone(),
+            Command::WHO => session.current_user().to_string(),
             Command::LS => {
                 let out = session
                     .list()

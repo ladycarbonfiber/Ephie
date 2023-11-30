@@ -3,34 +3,63 @@
 In memory file system mostly as a playground for async rust
 
 ## Features
-(all commands are in client emulations mirroring gnu tools for usability/discoverability)
+(When possible commands mirror gnu utils for discoverability)
 
-- [X] Change working directory with `cd`
+- [ ] Terminal Client
 
-- [X] Create a new directory with `mkdir`
+  - [X] Interactive
 
-- [ ] Remove directory or "file" with `rm`
+  - [ ] Multi-user Concurrent Support
 
-- [ ] Create a new file with `touch`
+  - [ ] Auto clear
 
-- [ ] Write to file with `cat`
+  - [ ] Help
 
-- [ ] Read out file with `cat`
-
-- [ ] Search working directory with `find`
-
-- [ ] Support for path operations
+- [ ] Change working directory with `cd`
 
   - [X] absolute path
 
   - [ ] parent path
 
+  - [X] relative path
+
+- [ ] Create a new directory with `mkdir`
+
+  - [X] absolute path
+
+  - [ ] parent path
+
+  - [X] relative path
+
+  - [X] auto mkdir
+
+- [ ] Remove directory or "file" with `rm`
+
+  - [ ] absolute path
+
+  - [ ] parent path
+
   - [ ] relative path
 
-  - [ ] auto mkdir
+- [ ] Create a new file with `touch`
 
+- [ ] Write to file with `write`
 
-- [ ] Directory `cp` and `mv`
+- [ ] Read out file with `read`
+
+- [ ] Search working directory with `find`
+
+- [ ] `cp`
+
+  - [ ] Files
+
+  - [ ] Directories
+
+ - [ ] `mv`
+
+  - [ ] Files
+
+  - [ ] Directories
 
 - [ ] AuthZ
 
@@ -43,6 +72,10 @@ In memory file system mostly as a playground for async rust
   - [ ] switch users
 
   - [ ] Restrict access based on user/group membership 
+
+- [X] CI
+  - [X] Build on PR
+  - [X] Test on PR
 
 
 ## Requirements
