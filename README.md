@@ -55,7 +55,7 @@ In memory file system mostly as a playground for async rust
 
   - [ ] Directories
 
- - [ ] `mv`
+- [ ] `mv`
 
   - [ ] Files
 
