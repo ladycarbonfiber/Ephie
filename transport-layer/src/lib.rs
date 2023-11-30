@@ -22,7 +22,7 @@ mod tests {
     }
     #[test]
     fn test_from_opt() {
-        let opts = vec![(1u8, "Documents"), (2, "NewDir"), (3, "")];
+        let opts = vec![(1u8, "Documents".to_string()), (2, "NewDir".to_string()), (3, "".to_string())];
         let expected = vec![
             Command::CD("Documents".to_string()),
             Command::MKDIR("NewDir".to_string()),

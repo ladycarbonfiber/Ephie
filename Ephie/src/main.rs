@@ -2,45 +2,39 @@ mod session;
 mod system;
 mod test;
 mod trie;
-
+use session::Session;
 use std::path::PathBuf;
 use std::str;
-use session::Session;
-use system::FileSystem;
-use session::{Session};
-use std::{
-    collections::{HashMap, HashSet},
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use transport_layer::command::Command;
 use trie::FsLike;
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("127.0.0.1:8888").await.unwrap();
-    
+
     let mut system = FsLike::new();
     system
         .insert(PathBuf::from("/"), FsLike::new())
         .expect("Failed to insert");
     let db = Arc::new(Mutex::new(system));
-    
+
     //TODO hashmap of sessions
-    let session = Session {
+    let mut session = Session {
         user: "TestUser".to_owned(),
         working_dir: PathBuf::from("/"),
         file_system: db.clone(),
     };
 
-
     loop {
         let (socket, _) = listener.accept().await.unwrap();
 
-        process(socket).await;
+        process(socket, &mut session).await;
     }
 }
 
-async fn process(mut socket: TcpStream) {
+async fn process(mut socket: TcpStream, session: &mut Session) {
     println!("Processing");
     let mut buff = [0; 1];
     let mut out = String::new();
@@ -71,8 +65,30 @@ async fn process(mut socket: TcpStream) {
                 out.push_str(s);
             }
         }
-        let message = "success";
         println!("command:{command}\n {out}");
+        let parsed_command = Command::from((command, out));
+        let message = match parsed_command {
+            Command::CD(target) => match session.change_dir(target) {
+                Err(message) => message.to_string(),
+                Ok(()) => "".to_string(),
+            },
+            Command::PWD => session.working_dir.to_str().unwrap().to_string(),
+            Command::MKDIR(target) => match session.make_dir(target) {
+                Err(message) => message.to_string(),
+                Ok(()) => "".to_string(),
+            },
+            Command::WHO => session.user.clone(),
+            Command::LS => {
+                let out = session
+                    .list()
+                    .into_iter()
+                    .collect::<Vec<String>>()
+                    .join(" | ");
+                println!("out is {:#?}", out);
+                out.clone()
+            }
+            Command::UNKNOWN => "Unknown Command".to_string(),
+        };
         let mut payload = Vec::new();
         payload.push(message.len() as u8);
         payload.extend(message.as_bytes());

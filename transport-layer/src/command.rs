@@ -71,11 +71,11 @@ impl From<&str> for Command {
         }
     }
 }
-impl From<(u8, &str)> for Command {
-    fn from(value: (u8, &str)) -> Self {
+impl From<(u8, String)> for Command {
+    fn from(value: (u8, String)) -> Self {
         match value.0 {
-            1 => Command::CD(value.1.to_string()),
-            2 => Command::MKDIR(value.1.to_string()),
+            1 => Command::CD(value.1),
+            2 => Command::MKDIR(value.1),
             3 => Command::PWD,
             4 => Command::LS,
             5 => Command::WHO,
