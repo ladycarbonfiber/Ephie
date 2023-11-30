@@ -215,7 +215,7 @@ fn test_rm_file_nested_relative() {
     assert!(!out.contains("new.file"))
 }
 #[test]
-fn test_rm_directoru_nested() {
+fn test_rm_directory_nested() {
     let mut session = test_session();
     session.write_file(
         "Downloads/test/new.file".to_string(),
@@ -346,4 +346,19 @@ fn test_find_local_file() {
     session.change_dir("Downloads".to_string()).unwrap();
     let out = session.find_local("test".to_string()).unwrap();
     assert_eq!(out, vec!["test.hello"])
+}
+#[test]
+fn test_cp_file(){
+    let mut session = test_session();
+    session.copy("Downloads/test.hello".to_string(), "Documents/test.hello".to_string()).unwrap();
+    session.change_dir("/Documents".to_string()).unwrap();
+    let out = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+fn test_cp_to_here(){
+    let mut session = test_session();
+    session.copy("Downloads/test.hello".to_string(), "test.hello".to_string()).unwrap();
+    let out: Vec<u8> = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes())
 }

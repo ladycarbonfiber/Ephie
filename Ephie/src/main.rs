@@ -109,6 +109,17 @@ async fn process(mut socket: TcpStream, session: &mut Session) {
                     "Mismatched input".to_string()
                 }
             }
+            Command::CP(target) => {
+                let parts = target.split(WRITE_DELIM).collect::<Vec<&str>>();
+                if parts.len() == 2 {
+                    match session.copy(parts[0].to_string(), parts[1].to_string()) {
+                        Err(message) => message.to_string(),
+                        Ok(()) => "".to_string(),
+                    }
+                } else {
+                    "Mismatched input".to_string()
+                }
+            }
             Command::FIND(target) => match session.find_local(target) {
                 Err(mess) => mess.to_string(),
                 Ok(list) => {

@@ -62,7 +62,12 @@ impl Session {
     // Replaces .. with the parent of the current working directory for path navigation
     // TODO support nested relative .. in a path
     // probably would require stepping the working directory
+    // TODO make more generic
+    //TODO support `.` sugar
     fn adjust_target(&self, target: &str) -> Result<String, &'static str> {
+        // if target == "." {
+        //     return Ok(self.working_dir.to_str().unwrap().to_string())
+        // }
         let parent = self.working_dir.parent();
         if target.contains("..") {
             if target.starts_with("/") {
@@ -174,6 +179,24 @@ impl Session {
                 _ => return Err("Cannot be in a file"),
             },
             None => return Err("Current Dir is invalid for some reason, resetting to root"),
+        }
+    }
+    pub fn copy(&mut self, target: String, destination: String) -> Result<(), &'static str> {
+        let mut fs = self.file_system.lock().unwrap();
+        let mut target_dir = self.working_dir.clone();
+        let adjusted_target = self.adjust_target(&target)?;
+        let adjusted_destination = self.adjust_target(&destination)?;
+        let mut destination_dir = self.working_dir.clone();
+        destination_dir.push(PathBuf::from(adjusted_destination));
+        target_dir.push(PathBuf::from(adjusted_target));
+        let source_data = match fs.get(target_dir) {
+            None => Err("not found"),
+            Some(node) => Ok(node.clone()),
+        }?;
+        //TODO support directories
+        match source_data {
+            FileLike { .. } => fs.insert(destination_dir, source_data),
+            DirectoryLike { .. } => Err("copy not supported for directories yet"),
         }
     }
 }

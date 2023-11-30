@@ -57,11 +57,11 @@ In memory file system mostly as a playground for async rust
 
 - [X] Read out file with `read`
 
-- [ ] Search working directory with `find`
+- [X] Search working directory with `find`
 
 - [ ] `cp`
 
-  - [ ] Files
+  - [X] Files
 
   - [ ] Directories
 
