@@ -119,7 +119,7 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Re
                             0 => Command::UNKNOWN,
                             1 => Command::from(app.input.value()),
                             3 => {
-                                if parts[0] == "write" || parts[0] == "cp"{
+                                if parts[0] == "write" || parts[0] == "cp" || parts[0] =="mv"{
                                     let mut combined = String::new();
                                     combined.push_str(parts[1]);
                                     combined.push_str(WRITE_DELIM);

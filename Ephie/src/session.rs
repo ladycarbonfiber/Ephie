@@ -199,4 +199,8 @@ impl Session {
             DirectoryLike { .. } => Err("copy not supported for directories yet"),
         }
     }
+    pub fn mv(&mut self, target: String, destination: String) -> Result<(), &'static str> {
+        self.copy(target.clone(), destination)?;
+        self.remove(target)
+    }
 }

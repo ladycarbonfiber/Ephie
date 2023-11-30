@@ -14,8 +14,8 @@ pub enum Command {
     READ(String),
     WRITE(String),
     FIND(String),
-    CP(String)
-    
+    CP(String),
+    MV(String),
 }
 impl Command {
     pub fn opt_code(&self) -> u8 {
@@ -30,8 +30,9 @@ impl Command {
             Self::TOUCH(..) => 7,
             Self::READ(..) => 8,
             Self::WRITE(..) => 9,
-            Self::FIND(..) =>10,
-            Self::CP(..)=>11,
+            Self::FIND(..) => 10,
+            Self::CP(..) => 11,
+            Self::MV(..) => 12,
         }
     }
     // Bytes sent on the wire
@@ -54,7 +55,8 @@ impl Command {
             | Self::READ(target)
             | Self::WRITE(target)
             | Self::FIND(target)
-            | Self::CP(target) => {
+            | Self::CP(target)
+            | Self::MV(target) => {
                 payload.push(self.opt_code());
                 payload.push(target.len().try_into().unwrap());
                 payload.extend(target.as_bytes().into_iter().clone());
@@ -77,6 +79,7 @@ impl From<(&str, &str)> for Command {
             "write" => Command::WRITE(value.1.to_string()),
             "find" => Command::FIND(value.1.to_string()),
             "cp" => Command::CP(value.1.to_string()),
+            "mv" => Command::MV(value.1.to_string()),
             _ => Command::UNKNOWN,
         }
     }
@@ -105,6 +108,7 @@ impl From<(u8, String)> for Command {
             9 => Command::WRITE(value.1),
             10 => Command::FIND(value.1),
             11 => Command::CP(value.1),
+            12 => Command::MV(value.1),
             _ => Command::UNKNOWN,
         }
     }

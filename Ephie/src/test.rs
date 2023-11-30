@@ -348,17 +348,50 @@ fn test_find_local_file() {
     assert_eq!(out, vec!["test.hello"])
 }
 #[test]
-fn test_cp_file(){
+fn test_cp_file() {
     let mut session = test_session();
-    session.copy("Downloads/test.hello".to_string(), "Documents/test.hello".to_string()).unwrap();
+    session
+        .copy(
+            "Downloads/test.hello".to_string(),
+            "Documents/test.hello".to_string(),
+        )
+        .unwrap();
     session.change_dir("/Documents".to_string()).unwrap();
     let out = session.read_file("test.hello".to_string()).unwrap();
     assert_eq!(out, "hello world".as_bytes())
 }
 #[test]
-fn test_cp_to_here(){
+fn test_cp_to_here() {
     let mut session = test_session();
-    session.copy("Downloads/test.hello".to_string(), "test.hello".to_string()).unwrap();
+    session
+        .copy("Downloads/test.hello".to_string(), "test.hello".to_string())
+        .unwrap();
     let out: Vec<u8> = session.read_file("test.hello".to_string()).unwrap();
     assert_eq!(out, "hello world".as_bytes())
+}
+#[test]
+fn test_mv_file() {
+    let mut session = test_session();
+    session
+        .mv(
+            "Downloads/test.hello".to_string(),
+            "Documents/test.hello".to_string(),
+        )
+        .unwrap();
+    session.change_dir("/Documents".to_string()).unwrap();
+    let out = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes());
+    session.change_dir("/Downloads".to_string()).unwrap();
+    assert!(session.list().is_empty())
+}
+#[test]
+fn test_mv_to_here() {
+    let mut session = test_session();
+    session
+        .mv("Downloads/test.hello".to_string(), "test.hello".to_string())
+        .unwrap();
+    let out: Vec<u8> = session.read_file("test.hello".to_string()).unwrap();
+    assert_eq!(out, "hello world".as_bytes());
+    session.change_dir("/Downloads".to_string()).unwrap();
+    assert!(session.list().is_empty())
 }
