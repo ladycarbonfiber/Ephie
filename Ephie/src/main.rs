@@ -16,13 +16,17 @@ async fn main() {
     let listener = TcpListener::bind("127.0.0.1:8888").await.unwrap();
 
     let mut system = FsLike::new();
-    let mut sessions = DashMap::<String, Session>::new();
+    let mut sessions = DashMap::<u8, Session>::new();
     system
         .insert(PathBuf::from("/"), FsLike::new())
         .expect("Failed to insert");
     let db = Arc::new(Mutex::new(system));
     let session = Session::new("TestUser".to_string(), db.clone());
-    sessions.insert("TestUser".to_string(), session);
+
+    sessions.insert(1, session);
+    sessions.insert(2, Session::new("Liz".to_string(), db.clone()));
+    sessions.insert(3, Session::new("Emily".to_string(), db.clone()));
+
     let users = Arc::new(sessions);
     //TODO hashmap of sessions
 
@@ -35,11 +39,15 @@ async fn main() {
     }
 }
 
-async fn process(mut socket: TcpStream, session_ref: Arc<DashMap<String, Session>>) {
+async fn process(mut socket: TcpStream, session_ref: Arc<DashMap<u8, Session>>) {
     println!("Processing");
-    let mut session = session_ref.get_mut("TestUser").unwrap();
     let mut buff = [0; 1];
     let mut out = String::new();
+    socket
+        .read_exact(&mut buff)
+        .await
+        .expect("failed to read user from socket");
+    let mut session = session_ref.get_mut(&buff[0]).unwrap();
     let command_code = socket
         .read_exact(&mut buff)
         .await
@@ -147,7 +155,7 @@ async fn process(mut socket: TcpStream, session_ref: Arc<DashMap<String, Session
                     }
                 }
             },
-            Command::UNKNOWN => "Unknown Command".to_string(),
+            Command::UNKNOWN | Command::SU(..) => "Unknown Command".to_string(),
         };
         let mut payload = Vec::new();
         payload.push(message.len() as u8);
