@@ -1,0 +1,1 @@
+bash Ephie/target/release/ephied
